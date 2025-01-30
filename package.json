@@ -1,0 +1,31 @@
+{
+  "name": "electron-starter",
+  "productName": "Safebox",
+  "version": "1.0.0",
+  "description": "Simple starter package for Electron apps",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "nodemon --exec electron .",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=false --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"APP NAME\"",
+    "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=false --out=release-builds"
+  },
+  "keywords": [
+    "Electron"
+  ],
+  "author": "Brad Traversy",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^9.4.4",
+    "electron-packager": "^14.2.1",
+    "nodemon": "^2.0.22"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "electron-log": "^4.1.2",
+    "sequelize": "^6.37.5",
+    "sqlite3": "^5.1.7"
+  }
+}
