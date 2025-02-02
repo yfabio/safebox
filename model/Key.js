@@ -1,31 +1,40 @@
-const Sequelize = require("sequelize");
+const { DataTypes } = require("sequelize");
 
 const sequelize = require("../sqlite/db");
 
-const Key = sequelize.define("key", {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true,
+const Key = sequelize.define(
+  "key",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
+    },
+    date: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
-  date: {
-    type: Sequelize.DATE,
-    allowNull: false,
-  },
-  title: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    length: 40,
-  },
-  username: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    length: 40,
-  },
-  password: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    length: 120,
-  },
-});
+  {
+    timestamps: false,
+  }
+);
+
+module.exports = Key;

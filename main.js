@@ -3,6 +3,9 @@ const log = require("electron-log");
 
 const path = require("path");
 
+const sequelize = require("./sqlite/db");
+const Key = require("./model/Key");
+
 // Set env
 process.env.NODE_ENV = "development";
 
@@ -14,7 +17,7 @@ let mainWindow;
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     title: "APP NAME",
-    width: isDev ? 800 : 500,
+    width: isDev ? 1080 : 500,
     height: 600,
     minWidth: 600,
     icon: `${__dirname}/assets/icons/icon.png`,
@@ -36,11 +39,17 @@ function createMainWindow() {
   mainWindow.loadFile("./app/index.html");
 }
 
-app.on("ready", () => {
+app.on("ready", async () => {
   createMainWindow();
 
   const mainMenu = Menu.buildFromTemplate(menu);
   Menu.setApplicationMenu(mainMenu);
+
+  try {
+    await sequelize.sync();
+  } catch (error) {
+    console.log("error while synchronizing database", error);
+  }
 });
 
 const menu = [

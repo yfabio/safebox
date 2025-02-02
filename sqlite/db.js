@@ -1,7 +1,8 @@
-const Sequelize = require("sequelize");
+const { Sequelize } = require("sequelize");
 
-const sequelize = new Sequelize("safebox", "root", "root", {
-  host: "localhost",
+const sequelize = new Sequelize({
+  database: "safebox",
+  storage: "safebox.db",
   dialect: "sqlite",
 });
 

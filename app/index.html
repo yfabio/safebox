@@ -71,6 +71,31 @@
       </div>
     </header>
     <main class="tab-content mt-3 py-5">
+      <!-- generic toast -->
+      <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast" id="toast">
+          <div class="toast-body fw-bolder text-center"></div>
+        </div>
+      </div>
+
+      <!-- generic modal -->
+      <div class="modal fade" id="mymodal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 id="modal-title" class="modal-title fs-5"></h1>
+              <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div id="modal-body" class="modal-body"></div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" data-bs-dismiss="modal">
+                close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <section class="tab-pane fade active show" id="home">
         <div class="container">
           <div class="d-flex flex-column">
@@ -96,40 +121,7 @@
                   <th></th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>2025-01-22</td>
-                  <td>google</td>
-                  <td>email</td>
-                  <td>xxxx</td>
-                  <td>
-                    <button class="btn btn-sm btn-primary">
-                      <i class="bi bi-pencil"></i>
-                    </button>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-danger">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>2025-01-22</td>
-                  <td>google</td>
-                  <td>email</td>
-                  <td>xxxx</td>
-                  <td>
-                    <button id="btn-edit" class="btn btn-sm btn-primary">
-                      <i class="bi bi-pencil"></i>
-                    </button>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-danger">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
+              <tbody id="table-body"></tbody>
             </table>
             <nav aria-label="page navigation">
               <ul class="pagination justify-content-center">
@@ -155,7 +147,7 @@
           <h2 class="text-center">New Key</h2>
           <div class="row">
             <div class="col-md-6 offset-md-3">
-              <form action="#">
+              <form id="form-new-key">
                 <div class="mb-2">
                   <label for="Date" class="form-label">Date</label>
                   <input
@@ -179,7 +171,7 @@
                   <label for="Username">Username</label>
                   <input
                     type="text"
-                    name="Username"
+                    name="username"
                     id="usernmae"
                     placeholder="Username"
                     class="form-control"
@@ -245,6 +237,7 @@
                         name="length"
                         id="length"
                         class="form-check-input"
+                        checked
                       />
                     </div>
                   </div>
@@ -261,6 +254,7 @@
                         name="length"
                         id="length"
                         class="form-check-input"
+                        checked
                       />
                     </div>
                   </div>
@@ -277,6 +271,7 @@
                         name="length"
                         id="length"
                         class="form-check-input"
+                        checked
                       />
                     </div>
                   </div>
@@ -293,6 +288,7 @@
                         name="length"
                         id="length"
                         class="form-check-input"
+                        checked
                       />
                     </div>
                   </div>
@@ -300,11 +296,11 @@
                     <button class="btn btn-light">Generate</button>
                   </div>
                 </div>
+                <div class="d-flex align-items-center justify-content-end">
+                  <button class="btn btn-danger me-2">Cancel</button>
+                  <button type="submit" class="btn btn-primary">Save</button>
+                </div>
               </form>
-              <div class="d-flex align-items-center justify-content-end">
-                <button class="btn btn-danger me-2">Cancel</button>
-                <button class="btn btn-primary">Save</button>
-              </div>
             </div>
           </div>
         </div>
