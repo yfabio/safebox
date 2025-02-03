@@ -181,6 +181,11 @@ const homeTabEl = document.querySelector('[data-bs-target="#home"]');
 
 const formNewKey = document.getElementById("form-new-key");
 
+const btnCancelNewKey = document.getElementById("btn-cancel-new-key");
+btnCancelNewKey.addEventListener("click", () =>
+  new bootstrap.Tab(homeTabEl).show()
+);
+
 formNewKey.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -200,17 +205,24 @@ formNewKey.addEventListener("submit", (e) => {
     description: descValue,
   };
 
-  window.ctx.createKey(
-    key,
-    (message) => {
-      formNewKey.reset();
-      showToast("text-bg-success", message);
-      new bootstrap.Tab(homeTabEl).show();
-    },
-    (error) => {
-      showToast("text-bg-dange", error.message);
-    }
-  );
+  if (!formNewKey.checkValidity()) {
+    e.preventDefault();
+  } else {
+    window.ctx.createKey(
+      key,
+      (message) => {
+        formNewKey.reset();
+        showToast("text-bg-success", message);
+        new bootstrap.Tab(homeTabEl).show();
+      },
+      (error) => {
+        showToast("text-bg-dange", error.message);
+      }
+    );
+  }
+
+  formNewKey.classList.add("was-validated");
+  formNewKey.reset();
 });
 
 /**
@@ -218,13 +230,28 @@ formNewKey.addEventListener("submit", (e) => {
  */
 
 const tableBody = document.getElementById("table-body");
+const pagination = document.getElementById("pagination");
 
-homeTabEl.addEventListener("shown.bs.tab", loadKeys);
+const alertKeysEl = document.getElementById("content-keys-alert");
+const contentKeysEl = document.getElementById("content-keys");
 
-async function loadKeys() {
-  const keys = await window.ctx.getAllKeys((error) => {
+homeTabEl.addEventListener("shown.bs.tab", () => loadKeys());
+
+async function loadKeys(page = 1, filter = "") {
+  const result = await window.ctx.getAllKeys(page, filter, (error) => {
     showToast("text-bg-dange", error);
   });
+
+  if (result !== null && result?.keys.length === 0 && filter.length === 0) {
+    alertKeysEl.classList.remove("visually-hidden");
+    contentKeysEl.classList.add("visually-hidden");
+    return;
+  } else {
+    alertKeysEl.classList.add("visually-hidden");
+    contentKeysEl.classList.remove("visually-hidden");
+  }
+
+  const keys = result.keys;
 
   let content;
   tableBody.innerHTML = "";
@@ -257,8 +284,51 @@ async function loadKeys() {
     tableBody.innerHTML += content;
   });
 
+  let listPages = "";
+
+  for (let i = page; i <= result.numPages; i++) {
+    listPages += `<li class="page-item"><button onclick="nextPage(${i})" class="page-link ${
+      i === result.currentPage ? "active" : ""
+    }">${i}</button></li>`;
+  }
+
+  paginationContent = `
+                        <ul class="pagination justify-content-center">
+
+                          <li class="page-item ${
+                            !result.hasPreviousPage ? "disabled" : ""
+                          }">
+                            <button onclick="previousPage(${
+                              result.previousPage
+                            })" class="page-link" aria-label="previous">Previous</button>
+                          </li>
+
+                          ${listPages}                       
+                                                                            
+                          <li class="page-item ${
+                            !result.hasNextPage ? "disabled" : ""
+                          }">
+                            <button onclick="nextPage(${
+                              result.nextPage
+                            })" class="page-link" aria-label="next">Next</button>
+                          </li>
+
+                        </ul>
+                  
+                     `;
+
+  pagination.innerHTML = paginationContent;
+
   const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
   tooltips.forEach((tooltip) => new bootstrap.Tooltip(tooltip));
+}
+
+function previousPage(index) {
+  loadKeys(index);
+}
+
+function nextPage(index) {
+  loadKeys(index);
 }
 
 function clipBoardKey(id) {
@@ -318,6 +388,19 @@ function stopDeleting() {
   }
 }
 
+/**
+ *
+ *  Search
+ *
+ */
+
+const searchEl = document.getElementById("search");
+
+searchEl.addEventListener("input", (e) => {
+  loadKeys(1, e.target.value);
+});
+
+const endline = "";
 /**
  * Loading all key when window was ready
  */
