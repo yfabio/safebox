@@ -72,6 +72,13 @@ const menu = [
     : []),
 ];
 
+app.on("quit", async () => {
+  if (sequelize) {
+    await sequelize.close();
+    console.log("database was closed successfult");
+  }
+});
+
 app.on("window-all-closed", () => {
   if (!isMac) {
     app.quit();

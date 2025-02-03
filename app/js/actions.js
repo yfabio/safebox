@@ -286,7 +286,7 @@ async function loadKeys(page = 1, filter = "") {
 
   let listPages = "";
 
-  for (let i = page; i <= result.numPages; i++) {
+  for (let i = 1; i <= result.numPages; i++) {
     listPages += `<li class="page-item"><button onclick="nextPage(${i})" class="page-link ${
       i === result.currentPage ? "active" : ""
     }">${i}</button></li>`;
@@ -352,7 +352,7 @@ function confirmToClipBoard(id) {
 }
 
 function editKey(id) {
-  console.log(id);
+  console.log("editing the key ", id);
 }
 
 function deleteKey(id) {
