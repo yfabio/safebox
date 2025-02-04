@@ -175,26 +175,31 @@ function showModal(modalTitle, modalBody) {
 
 const homeTabEl = document.querySelector('[data-bs-target="#home"]');
 
-/**
- * Create new Key
- */
-
 const formNewKey = document.getElementById("form-new-key");
 
-const btnCancelNewKey = document.getElementById("btn-cancel-new-key");
-btnCancelNewKey.addEventListener("click", () =>
-  new bootstrap.Tab(homeTabEl).show()
-);
+const btnSaveNewKey = document.getElementById("btn-save-new-key");
 
+const btnCancelNewKey = document.getElementById("btn-cancel-new-key");
+btnCancelNewKey.addEventListener("click", () => {
+  formNewKey.reset();
+  btnSaveNewKey.textContent = "Save";
+  new bootstrap.Tab(homeTabEl).show();
+});
+
+/**
+ * Creating new key
+ */
 formNewKey.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const formData = new FormData(formNewKey);
 
+  const idValue = +formData.get("id");
+
   const dateValue = formData.get("date");
   const titleValue = formData.get("title");
   const usernameValue = formData.get("username");
-  const descValue = formData.get("desc");
+  const descValue = formData.get("description");
   const passwordValue = formData.get("password");
 
   const key = {
@@ -208,17 +213,33 @@ formNewKey.addEventListener("submit", (e) => {
   if (!formNewKey.checkValidity()) {
     e.preventDefault();
   } else {
-    window.ctx.createKey(
-      key,
-      (message) => {
-        formNewKey.reset();
-        showToast("text-bg-success", message);
-        new bootstrap.Tab(homeTabEl).show();
-      },
-      (error) => {
-        showToast("text-bg-dange", error.message);
-      }
-    );
+    if (idValue) {
+      key.id = idValue;
+      window.ctx.updateKey(
+        key,
+        (message) => {
+          formNewKey.reset();
+          showToast("text-bg-success", message);
+          new bootstrap.Tab(homeTabEl).show();
+        },
+        (error) => {
+          showToast("text-bg-dange", error);
+        }
+      );
+      btnSaveNewKey.textContent = "Save";
+    } else {
+      window.ctx.createKey(
+        key,
+        (message) => {
+          formNewKey.reset();
+          showToast("text-bg-success", message);
+          new bootstrap.Tab(homeTabEl).show();
+        },
+        (error) => {
+          showToast("text-bg-dange", error);
+        }
+      );
+    }
   }
 
   formNewKey.classList.add("was-validated");
@@ -344,6 +365,10 @@ function clipBoardKey(id) {
   showModal(title, body);
 }
 
+/**
+ * Copying to clipboard once users type their password.
+ * @param {int} id
+ */
 function confirmToClipBoard(id) {
   console.log("confirm to clipboard ", id);
   if (bsModal) {
@@ -351,10 +376,30 @@ function confirmToClipBoard(id) {
   }
 }
 
-function editKey(id) {
-  console.log("editing the key ", id);
+/**
+ * Editing a key
+ * @param {int} id
+ */
+async function editKey(id) {
+  const dbKey = await window.ctx.getKeyById(id, (error) => {
+    showToast("text-bg-danger", error);
+  });
+
+  for (let key in dbKey) {
+    formNewKey.elements[key].value = dbKey[key];
+  }
+
+  btnSaveNewKey.textContent = "Edit";
+
+  const tabEl = document.querySelector('[data-bs-target="#new-key"]');
+  const tabNewKey = new bootstrap.Tab(tabEl);
+  tabNewKey.show();
 }
 
+/**
+ * Dialog confirming removal of a key
+ * @param {in} id
+ */
 function deleteKey(id) {
   const title = "Are you sure (y/n)?";
 
@@ -368,6 +413,11 @@ function deleteKey(id) {
   showModal(title, body);
 }
 
+/**
+ *  Deleting a key
+ *
+ * @param {int} id
+ */
 function proceedDeleting(id) {
   window.ctx.deleteKey(
     id,
@@ -382,6 +432,9 @@ function proceedDeleting(id) {
   );
 }
 
+/**
+ * Closing modal
+ */
 function stopDeleting() {
   if (bsModal) {
     bsModal.hide();
@@ -389,11 +442,8 @@ function stopDeleting() {
 }
 
 /**
- *
- *  Search
- *
+ * Searing for keys
  */
-
 const searchEl = document.getElementById("search");
 
 searchEl.addEventListener("input", (e) => {

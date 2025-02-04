@@ -12,6 +12,16 @@ const onCreateKey = async (key, success, error) => {
   }
 };
 
+const onUpdateKey = async (key, success, error) => {
+  try {
+    await Key.update({ ...key }, { where: { id: key.id } });
+    success(`key was updated! #id ${key.id}`);
+  } catch (err) {
+    error("error while updating key");
+    console.log(err);
+  }
+};
+
 const onGetAllKeys = async (page, filter, error) => {
   const ITEMS_PER_PAGE = 6;
 
@@ -61,8 +71,19 @@ const onDeleteKey = async (id, success, error) => {
   }
 };
 
+const onGetKeyById = async (id, error) => {
+  try {
+    const dbKey = await Key.findByPk(id);
+    return dbKey.dataValues;
+  } catch (error) {
+    error("error while retrieving key");
+  }
+};
+
 contextBridge.exposeInMainWorld("ctx", {
   createKey: onCreateKey,
   getAllKeys: onGetAllKeys,
   deleteKey: onDeleteKey,
+  getKeyById: onGetKeyById,
+  updateKey: onUpdateKey,
 });

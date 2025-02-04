@@ -110,7 +110,7 @@
                 type="text"
                 name="search"
                 id="search"
-                placeholder="Search"
+                placeholder="Search by title"
                 class="form-control"
               />
             </div>
@@ -138,6 +138,7 @@
           <div class="row">
             <div class="col-md-6 offset-md-3">
               <form id="form-new-key" novalidate>
+                <input type="text" name="id" hidden />
                 <div class="mb-2">
                   <label for="Date" class="form-label">Date</label>
                   <input
@@ -174,10 +175,12 @@
                   <div class="invalid-feedback">Please Add a Username</div>
                 </div>
                 <div class="mb-2">
-                  <label for="desc" class="form-label">Description</label>
+                  <label for="description" class="form-label"
+                    >Description</label
+                  >
                   <textarea
-                    name="desc"
-                    id="desc"
+                    name="description"
+                    id="description"
                     rows="4"
                     placeholder="Description"
                     class="form-control"
@@ -302,7 +305,13 @@
                   >
                     Cancel
                   </button>
-                  <button type="submit" class="btn btn-primary">Save</button>
+                  <button
+                    id="btn-save-new-key"
+                    type="submit"
+                    class="btn btn-primary"
+                  >
+                    Save
+                  </button>
                 </div>
               </form>
             </div>
