@@ -282,7 +282,7 @@ async function loadKeys(page = 1, filter = "") {
     <td>${key.date}</td>
     <td>${key.title}</td>
     <td>${key.username}</td>
-    <td>${key.password}</td>
+    <td class="text-truncate">${key.password}</td>
     <td>
       <button onclick="clipBoardKey(${key.id})" class="btn btn-sm btn-outline-dark"       
       data-bs-toggle="tooltip" 
