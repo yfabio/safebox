@@ -339,9 +339,6 @@ async function loadKeys(page = 1, filter = "") {
                      `;
 
   pagination.innerHTML = paginationContent;
-
-  const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  tooltips.forEach((tooltip) => new bootstrap.Tooltip(tooltip));
 }
 
 function previousPage(index) {
@@ -455,3 +452,10 @@ const endline = "";
  * Loading all key when window was ready
  */
 (async () => loadKeys())();
+
+/**
+ * Initializing topltips
+ */
+
+const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+tooltips.forEach((tooltip) => new bootstrap.Tooltip(tooltip));

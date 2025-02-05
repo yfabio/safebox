@@ -5,6 +5,10 @@ const path = require("path");
 
 const sequelize = require("./sqlite/db");
 const Key = require("./model/Key");
+const Person = require("./model/Person");
+
+Person.hasMany(Key);
+Key.belongsTo(Person);
 
 // Set env
 process.env.NODE_ENV = "development";
@@ -16,7 +20,7 @@ let mainWindow;
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-    title: "APP NAME",
+    title: "Safebox",
     width: isDev ? 1080 : 500,
     height: 600,
     minWidth: 600,

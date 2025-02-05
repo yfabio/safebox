@@ -1,8 +1,13 @@
 const { Sequelize } = require("sequelize");
 
+const path = require("path");
+const os = require("os");
+
+const dbFile = path.join(os.homedir(), "safebox", "safebox.db");
+
 const sequelize = new Sequelize({
   database: "safebox",
-  storage: "safebox.db",
+  storage: dbFile,
   dialect: "sqlite",
 });
 
