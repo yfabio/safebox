@@ -17,6 +17,7 @@ const isDev = process.env.NODE_ENV !== "production" ? true : false;
 const isMac = process.platform === "darwin" ? true : false;
 
 let mainWindow;
+let loginWindow;
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
@@ -43,8 +44,35 @@ function createMainWindow() {
   mainWindow.loadFile("./app/index.html");
 }
 
+function createLoginWindow() {
+  loginWindow = new BrowserWindow({
+    title: "Safebox",
+    width: isDev ? 800 : 400,
+    minWidth: 800,
+    height: 400,
+    icon: `${__dirname}/assets/icons/icon.png`,
+    resizable: isDev ? true : false,
+    backgroundColor: "white",
+    webPreferences: {
+      sandbox: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      worldSafeExecuteJavaScript: true,
+      preload: path.join(__dirname, "preloader.js"),
+    },
+  });
+
+  if (isDev) {
+    loginWindow.webContents.openDevTools();
+  }
+
+  loginWindow.loadFile("./app/login.html");
+}
+
 app.on("ready", async () => {
-  createMainWindow();
+  //createMainWindow();
+
+  createLoginWindow();
 
   const mainMenu = Menu.buildFromTemplate(menu);
   Menu.setApplicationMenu(mainMenu);

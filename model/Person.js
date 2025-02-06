@@ -19,6 +19,14 @@ const Person = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    picture: {
+      type: DataTypes.BLOB,
+      allowNull: true,
+    },
   },
   {
     timestamps: false,
