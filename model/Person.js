@@ -7,7 +7,7 @@ const Person = sequelize.define(
   {
     id: {
       type: DataTypes.INTEGER,
-      autoImcrement: true,
+      autoIncrement: true,
       allowNull: false,
       primaryKey: true,
     },
@@ -24,7 +24,7 @@ const Person = sequelize.define(
       allowNull: true,
     },
     picture: {
-      type: DataTypes.BLOB,
+      type: DataTypes.BLOB("long"),
       allowNull: true,
     },
   },

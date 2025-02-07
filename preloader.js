@@ -1,6 +1,10 @@
 const { contextBridge, ipcRenderer } = require("electron");
 const { Op } = require("sequelize");
+
+const fs = require("fs");
+
 const Key = require("./model/Key");
+const Person = require("./model/Person");
 
 const onCreateKey = async (key, success, error) => {
   try {
@@ -80,10 +84,34 @@ const onGetKeyById = async (id, error) => {
   }
 };
 
+const onSavePerson = async (obj, success, error) => {
+  try {
+    let imageBuffer = null;
+
+    if (obj.image !== null && obj.image.length > 0) {
+      imageBuffer = fs.readFileSync(obj.image);
+    }
+
+    const person = {
+      username: obj.username,
+      password: obj.password,
+      email: obj.email,
+      picture: imageBuffer,
+    };
+
+    const personSaved = await Person.create({ ...person });
+    success("person was saved successfully!");
+  } catch (error) {
+    console.log(error);
+    error("Error while saving the person");
+  }
+};
+
 contextBridge.exposeInMainWorld("ctx", {
   createKey: onCreateKey,
   getAllKeys: onGetAllKeys,
   deleteKey: onDeleteKey,
   getKeyById: onGetKeyById,
   updateKey: onUpdateKey,
+  savePerson: onSavePerson,
 });
