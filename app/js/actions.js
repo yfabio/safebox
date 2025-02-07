@@ -447,6 +447,22 @@ searchEl.addEventListener("input", (e) => {
   loadKeys(1, e.target.value);
 });
 
+/**
+ * Login button and logged user
+ */
+
+const btnLogoutEl = document.getElementById("btn-logout");
+
+btnLogoutEl.addEventListener("click", (e) => {
+  e.preventDefault();
+  window.ctx.logout();
+});
+
+window.ctx.loadImage((img) => {
+  const imgUserEl = document.getElementById("img-user");
+  imgUserEl.src = `data:image/png;base64,${img}`;
+});
+
 const endline = "";
 /**
  * Loading all key when window was ready

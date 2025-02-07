@@ -42,6 +42,12 @@ function createMainWindow() {
   }
 
   mainWindow.loadFile("./app/index.html");
+
+  mainWindow.on("close", () => {
+    if (mainWindow) {
+      mainWindow = null;
+    }
+  });
 }
 
 function createLoginWindow() {
@@ -70,16 +76,18 @@ function createLoginWindow() {
 
   loginWindow.on("close", () => {
     if (loginWindow) {
-      console.log("login window was closed!");
       loginWindow = null;
     }
   });
 }
 
 app.on("ready", async () => {
-  //createMainWindow();
-
+  createMainWindow();
   createLoginWindow();
+
+  if (mainWindow) {
+    mainWindow.hide();
+  }
 
   const mainMenu = Menu.buildFromTemplate(menu);
   Menu.setApplicationMenu(mainMenu);
@@ -91,10 +99,23 @@ app.on("ready", async () => {
   }
 });
 
-ipcMain.on("success:login", (e, person) => {
-  if (person) {
-    createMainWindow();
-    loginWindow.close();
+ipcMain.on("success:login", async (e, person) => {
+  if (person && mainWindow !== null && loginWindow !== null) {
+    loginWindow.hide();
+    mainWindow.show();
+
+    const personDb = await Person.findByPk(person.id);
+
+    const img64 = personDb.picture.toString("base64");
+
+    mainWindow.webContents.send("user:image", img64);
+  }
+});
+
+ipcMain.on("user:logout", () => {
+  if (mainWindow) {
+    mainWindow.hide();
+    loginWindow.show();
   }
 });
 

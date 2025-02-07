@@ -88,8 +88,8 @@ const onSavePerson = async (obj, success, error) => {
   try {
     let imageBuffer = null;
 
-    if (obj.image !== null && obj.image.length > 0) {
-      imageBuffer = fs.readFileSync(obj.image);
+    if (obj.path !== null && obj.path.length > 0) {
+      imageBuffer = fs.readFileSync(obj.path);
     }
 
     const person = {
@@ -117,6 +117,7 @@ const onLogin = async (obj, success, error) => {
     if (personDb) {
       localStorage.setItem("user", personDb.id);
       ipcRenderer.send("success:login", personDb.dataValues);
+      success({ success: true });
     } else {
       success({
         success: false,
@@ -128,6 +129,16 @@ const onLogin = async (obj, success, error) => {
   }
 };
 
+const onLogout = () => {
+  ipcRenderer.send("user:logout");
+};
+
+const onLoadImage = (setImage) => {
+  ipcRenderer.on("user:image", (e, data) => {
+    setImage(data);
+  });
+};
+
 contextBridge.exposeInMainWorld("ctx", {
   createKey: onCreateKey,
   getAllKeys: onGetAllKeys,
@@ -136,4 +147,6 @@ contextBridge.exposeInMainWorld("ctx", {
   updateKey: onUpdateKey,
   savePerson: onSavePerson,
   login: onLogin,
+  logout: onLogout,
+  loadImage: onLoadImage,
 });

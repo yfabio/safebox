@@ -31,7 +31,7 @@ registerForm.addEventListener("submit", (e) => {
     username: usernameValue,
     password: passwordValue,
     email: emailValue,
-    image: imageValue.path,
+    path: imageValue.path,
   };
 
   window.ctx.savePerson(
@@ -65,9 +65,7 @@ loginForm.addEventListener("submit", (e) => {
   window.ctx.login(
     credential,
     (result) => {
-      if (result.success) {
-        showToast("text-bg-danger", result.message);
-      } else {
+      if (!result.success) {
         showToast("text-bg-warning", result.message);
       }
       loginForm.reset();
