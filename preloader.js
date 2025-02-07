@@ -107,6 +107,27 @@ const onSavePerson = async (obj, success, error) => {
   }
 };
 
+const onLogin = async (obj, success, error) => {
+  try {
+    const personDb = await Person.findOne({
+      where: {
+        [Op.and]: [{ username: obj.username }, { password: obj.password }],
+      },
+    });
+    if (personDb) {
+      localStorage.setItem("user", personDb.id);
+      ipcRenderer.send("success:login", personDb.dataValues);
+    } else {
+      success({
+        success: false,
+        message: `Could not find user ${obj.username}`,
+      });
+    }
+  } catch (error) {
+    error("Error while trying to login");
+  }
+};
+
 contextBridge.exposeInMainWorld("ctx", {
   createKey: onCreateKey,
   getAllKeys: onGetAllKeys,
@@ -114,4 +135,5 @@ contextBridge.exposeInMainWorld("ctx", {
   getKeyById: onGetKeyById,
   updateKey: onUpdateKey,
   savePerson: onSavePerson,
+  login: onLogin,
 });

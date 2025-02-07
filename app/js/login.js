@@ -37,11 +37,59 @@ registerForm.addEventListener("submit", (e) => {
   window.ctx.savePerson(
     obj,
     (message) => {
-      console.log(message);
+      registerForm.reset();
+      showToast("text-bg-success", message);
       alreadyHaveLink.click();
     },
     (error) => {
-      console.log(error);
+      showToast("text-bg-danger", error);
     }
   );
 });
+
+const loginForm = document.querySelector(".login #form-login");
+
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(loginForm);
+
+  const usernameValue = formData.get("username");
+  const passwordValue = formData.get("password");
+
+  const credential = {
+    username: usernameValue,
+    password: passwordValue,
+  };
+
+  window.ctx.login(
+    credential,
+    (result) => {
+      if (result.success) {
+        showToast("text-bg-danger", result.message);
+      } else {
+        showToast("text-bg-warning", result.message);
+      }
+      loginForm.reset();
+    },
+    (error) => {
+      showToast("text-bg-danger", error);
+    }
+  );
+});
+
+const toast = document.getElementById("toast");
+const toastBody = document.querySelector(".toast-body");
+
+function showToast(className, content) {
+  toastBody.classList.add(className);
+  toastBody.textContent = content;
+  toast.addEventListener("hidden.bs.toast", () =>
+    toastBody.classList.remove(className)
+  );
+  new bootstrap.Toast(toast, {
+    animation: true,
+    autohide: true,
+    delay: 2000,
+  }).show();
+}

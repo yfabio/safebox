@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require("electron");
+const { app, ipcMain, BrowserWindow, Menu } = require("electron");
 const log = require("electron-log");
 
 const path = require("path");
@@ -67,6 +67,13 @@ function createLoginWindow() {
   }
 
   loginWindow.loadFile("./app/login.html");
+
+  loginWindow.on("close", () => {
+    if (loginWindow) {
+      console.log("login window was closed!");
+      loginWindow = null;
+    }
+  });
 }
 
 app.on("ready", async () => {
@@ -81,6 +88,13 @@ app.on("ready", async () => {
     await sequelize.sync();
   } catch (error) {
     console.log("error while synchronizing database", error);
+  }
+});
+
+ipcMain.on("success:login", (e, person) => {
+  if (person) {
+    createMainWindow();
+    loginWindow.close();
   }
 });
 
