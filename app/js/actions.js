@@ -307,7 +307,7 @@ async function loadKeys(page = 1, filter = "") {
     contentKeysEl.classList.remove("visually-hidden");
   }
 
-  if (result !== null && result.keys !== undefined && result.keys !== null) {
+  if (result !== null && result.keys !== null && result.keys !== undefined) {
     let content;
     tableBody.innerHTML = "";
 
