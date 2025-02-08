@@ -116,7 +116,7 @@ function showToast(className, content) {
 
 /**
  *
- * generic modal
+ * Generic modal
  *
  */
 
@@ -286,7 +286,7 @@ const alertKeysEl = document.getElementById("content-keys-alert");
 const contentKeysEl = document.getElementById("content-keys");
 
 /**
- *  switch tab event
+ *  Switch event home tab
  */
 homeTabEl.addEventListener("shown.bs.tab", () => {
   loadKeys();
@@ -384,6 +384,11 @@ function nextPage(index) {
   loadKeys(index);
 }
 
+/**
+ * Copy to clipboard function
+ *
+ * @param {Number} id
+ */
 function copyToclipboard(id) {
   displayModal(async (value) => {
     const isPasswordValid = await window.ctx.confirmPassword(value);
@@ -407,7 +412,7 @@ function copyToclipboard(id) {
 
 /**
  * Editing a key
- * @param {int} id
+ * @param {Number} id
  */
 async function editKey(id) {
   const dbKey = await window.ctx.getKeyById(id, (error) => {
@@ -426,8 +431,8 @@ async function editKey(id) {
 }
 
 /**
- * Dialog confirming removal of a key
- * @param {in} id
+ * Dialog  to confirm removal of a key
+ * @param {Number} id
  */
 function deleteKey(id) {
   const title = "Are you sure (y/n)?";
@@ -445,7 +450,7 @@ function deleteKey(id) {
 /**
  *  Deleting a key
  *
- * @param {int} id
+ * @param {Number} id
  */
 function proceedDeleting(id) {
   window.ctx.deleteKey(
@@ -559,6 +564,12 @@ formSettingsEl.addEventListener("submit", async (e) => {
   }
 });
 
+/**
+ * Function to update the logged user username and image
+ *
+ * @param {Object} person
+ */
+
 function updatePersonDetails(person) {
   if (person !== null) {
     const imgUserEl = document.getElementById("img-user");
@@ -609,14 +620,13 @@ function togglePassowrdMaskSettings(e, pwd, icon) {
   }
 }
 
-const endline = "";
 /**
  * Loading all key when window was ready
  */
 (async () => loadKeys())();
 
 /**
- * Initializing topltips
+ * Initializing all topltips
  */
 
 const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');

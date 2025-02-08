@@ -20,6 +20,9 @@ alreadyHaveLink.addEventListener("click", (e) => {
   registerForm.classList.remove("was-validated");
 });
 
+/**
+ * Register user
+ */
 registerForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -54,6 +57,10 @@ registerForm.addEventListener("submit", (e) => {
     );
   }
 });
+
+/**
+ * Login
+ */
 
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();

@@ -11,7 +11,6 @@ const Session = require("./model/Session");
 Person.hasMany(Key, { onDelete: "CASCADE" });
 Key.belongsTo(Person);
 
-// Set env
 process.env.NODE_ENV = "development";
 
 const isDev = process.env.NODE_ENV !== "production" ? true : false;
@@ -23,7 +22,7 @@ let loginWindow;
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     title: "Safebox",
-    width: isDev ? 1080 : 500,
+    width: 1080,
     height: 600,
     minWidth: 600,
     icon: `${__dirname}/assets/icons/icon.png`,
@@ -55,9 +54,9 @@ function createMainWindow() {
 function createLoginWindow() {
   loginWindow = new BrowserWindow({
     title: "Safebox",
-    width: isDev ? 800 : 400,
-    minWidth: 800,
-    height: 400,
+    width: 1080,
+    minWidth: 600,
+    height: 600,
     icon: `${__dirname}/assets/icons/icon.png`,
     resizable: isDev ? true : false,
     backgroundColor: "white",
