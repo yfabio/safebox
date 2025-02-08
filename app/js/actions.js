@@ -1,31 +1,4 @@
 /**
- * Toggle Password Mask
- */
-
-let visible = false;
-const inputGroups = document.querySelectorAll(".input-group");
-
-inputGroups.forEach((inputGroup) => {
-  const btn = inputGroup.querySelector(".btn");
-  const pwd = inputGroup.querySelector('[type="password"]');
-  const icon = btn.querySelector(".bi");
-  btn.addEventListener("click", (e) => togglePassowrdMask(e, pwd, icon));
-});
-
-function togglePassowrdMask(e, pwd, icon) {
-  e.preventDefault();
-  visible = !visible;
-  pwd.type = visible ? "text" : "password";
-  if (visible) {
-    icon.classList.add("bi-eye");
-    icon.classList.remove("bi-eye-slash");
-  } else {
-    icon.classList.add("bi-eye-slash");
-    icon.classList.remove("bi-eye");
-  }
-}
-
-/**
  * Generate Password
  */
 
@@ -162,6 +135,7 @@ function showModal(modalTitle, modalBody) {
   modalEl.addEventListener("hidden.bs.modal", () => {
     modalTitleEl.textContent = "";
     modalBodyEl.innerHTML = "";
+    bsModal = null;
   });
 
   bsModal = new bootstrap.Modal(modalEl, {
@@ -171,6 +145,35 @@ function showModal(modalTitle, modalBody) {
   });
 
   bsModal.show();
+}
+
+/**
+ *  Confirm Modal
+ *
+ */
+
+function displayModal(result) {
+  const title = "Type your password to allow this";
+  const body = `
+                <div class="input-group">
+                  <input type="password" name="confirmPassowrd" id="confirmPassowrd" class="form-control">
+                  <button id="btnConfirmPassword" class="btn btn-outline-dark">confirm</button>
+                </div>
+            `;
+  showModal(title, body);
+  const btn = document.getElementById("btnConfirmPassword");
+  document
+    .getElementById("confirmPassowrd")
+    .addEventListener("keydown", (e) => {
+      if (e.code.toLowerCase() === "enter") {
+        btn.click();
+      }
+    });
+
+  btn.addEventListener("click", () => {
+    const value = document.getElementById("confirmPassowrd").value;
+    result(value);
+  });
 }
 
 const homeTabEl = document.querySelector('[data-bs-target="#home"]');
@@ -191,6 +194,30 @@ btnCancelNewKey.addEventListener("click", () => {
 /**
  * Creating new key
  */
+
+let visibleNewKey = false;
+const inputGroupNewKey = document.querySelector(".input-group.new-key");
+
+const btnNewKey = inputGroupNewKey.querySelector(".btn");
+const pwdNewKey = inputGroupNewKey.querySelector('[type="password"]');
+const iconNewKey = btnNewKey.querySelector(".bi");
+btnNewKey.addEventListener("click", (e) =>
+  togglePassowrdMaskNewKey(e, pwdNewKey, iconNewKey)
+);
+
+function togglePassowrdMaskNewKey(e, pwd, icon) {
+  e.preventDefault();
+  visibleNewKey = !visibleNewKey;
+  pwd.type = visibleNewKey ? "text" : "password";
+  if (visibleNewKey) {
+    icon.classList.add("bi-eye");
+    icon.classList.remove("bi-eye-slash");
+  } else {
+    icon.classList.add("bi-eye-slash");
+    icon.classList.remove("bi-eye");
+  }
+}
+
 formNewKey.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -214,6 +241,7 @@ formNewKey.addEventListener("submit", (e) => {
 
   if (!formNewKey.checkValidity()) {
     e.preventDefault();
+    formNewKey.classList.add("was-validated");
   } else {
     if (idValue) {
       key.id = idValue;
@@ -245,9 +273,6 @@ formNewKey.addEventListener("submit", (e) => {
       );
     }
   }
-
-  formNewKey.classList.add("was-validated");
-  formNewKey.reset();
 });
 
 /**
@@ -260,8 +285,12 @@ const pagination = document.getElementById("pagination");
 const alertKeysEl = document.getElementById("content-keys-alert");
 const contentKeysEl = document.getElementById("content-keys");
 
+/**
+ *  switch tab event
+ */
 homeTabEl.addEventListener("shown.bs.tab", () => {
   loadKeys();
+  formNewKey.classList.remove("was-validated");
 });
 
 async function loadKeys(page = 1, filter = "") {
@@ -278,77 +307,73 @@ async function loadKeys(page = 1, filter = "") {
     contentKeysEl.classList.remove("visually-hidden");
   }
 
-  let keys = [];
+  if (result !== null && result.keys !== undefined && result.keys !== null) {
+    let content;
+    tableBody.innerHTML = "";
 
-  if (result?.keys) {
-    keys = result.keys;
+    result.keys.forEach((key) => {
+      content = `<tr id=row>
+      <td>${key.date}</td>
+      <td>${key.title}</td>
+      <td>${key.username}</td>
+      <td class="text-truncate">${key.password}</td>
+      <td>
+        <button onclick="clipBoardKey(${key.id})" class="btn btn-sm btn-outline-dark"       
+        data-bs-toggle="tooltip" 
+        data-bs-title="copy to clipboard">
+          <i class="bi bi-clipboard"></i>
+        </button>
+      </td>
+      <td>
+        <button  onclick="editKey(${key.id})" class="btn btn-sm btn-primary">
+          <i class="bi bi-pencil"></i>
+        </button>
+      </td>
+      <td>
+        <button onclick="deleteKey(${key.id})" class="btn btn-sm btn-danger">
+          <i class="bi bi-trash"></i>
+        </button>
+      </td>  
+    </tr>`;
+
+      tableBody.innerHTML += content;
+    });
+
+    let listPages = "";
+
+    for (let i = 1; i <= result?.numPages; i++) {
+      listPages += `<li class="page-item"><button onclick="nextPage(${i})" class="page-link ${
+        i === result?.currentPage ? "active" : ""
+      }">${i}</button></li>`;
+    }
+
+    paginationContent = `
+                          <ul class="pagination justify-content-center">
+  
+                            <li class="page-item ${
+                              !result.hasPreviousPage ? "disabled" : ""
+                            }">
+                              <button onclick="previousPage(${
+                                result.previousPage
+                              })" class="page-link" aria-label="previous">Previous</button>
+                            </li>
+  
+                            ${listPages}                       
+                                                                              
+                            <li class="page-item ${
+                              !result.hasNextPage ? "disabled" : ""
+                            }">
+                              <button onclick="nextPage(${
+                                result.nextPage
+                              })" class="page-link" aria-label="next">Next</button>
+                            </li>
+  
+                          </ul>
+                    
+                       `;
+
+    pagination.innerHTML = paginationContent;
   }
-
-  let content;
-  tableBody.innerHTML = "";
-
-  keys.forEach((key) => {
-    content = `<tr id=row>
-    <td>${key.date}</td>
-    <td>${key.title}</td>
-    <td>${key.username}</td>
-    <td class="text-truncate">${key.password}</td>
-    <td>
-      <button onclick="clipBoardKey(${key.id})" class="btn btn-sm btn-outline-dark"       
-      data-bs-toggle="tooltip" 
-      data-bs-title="copy to clipboard">
-        <i class="bi bi-clipboard"></i>
-      </button>
-    </td>
-    <td>
-      <button  onclick="editKey(${key.id})" class="btn btn-sm btn-primary">
-        <i class="bi bi-pencil"></i>
-      </button>
-    </td>
-    <td>
-      <button onclick="deleteKey(${key.id})" class="btn btn-sm btn-danger">
-        <i class="bi bi-trash"></i>
-      </button>
-    </td>  
-  </tr>`;
-
-    tableBody.innerHTML += content;
-  });
-
-  let listPages = "";
-
-  for (let i = 1; i <= result?.numPages; i++) {
-    listPages += `<li class="page-item"><button onclick="nextPage(${i})" class="page-link ${
-      i === result.currentPage ? "active" : ""
-    }">${i}</button></li>`;
-  }
-
-  paginationContent = `
-                        <ul class="pagination justify-content-center">
-
-                          <li class="page-item ${
-                            !result.hasPreviousPage ? "disabled" : ""
-                          }">
-                            <button onclick="previousPage(${
-                              result.previousPage
-                            })" class="page-link" aria-label="previous">Previous</button>
-                          </li>
-
-                          ${listPages}                       
-                                                                            
-                          <li class="page-item ${
-                            !result.hasNextPage ? "disabled" : ""
-                          }">
-                            <button onclick="nextPage(${
-                              result.nextPage
-                            })" class="page-link" aria-label="next">Next</button>
-                          </li>
-
-                        </ul>
-                  
-                     `;
-
-  pagination.innerHTML = paginationContent;
 }
 
 function previousPage(index) {
@@ -388,8 +413,6 @@ function confirmToClipBoard(id) {
  * @param {int} id
  */
 async function editKey(id) {
-  console.log(id);
-
   const dbKey = await window.ctx.getKeyById(id, (error) => {
     showToast("text-bg-danger", error);
   });
@@ -482,6 +505,112 @@ window.ctx.loadImage((obj) => {
   }
   loadKeys();
 });
+
+/**
+ * Settings
+ */
+
+const settingsTabEl = document.querySelector('[data-bs-target="#settings"]');
+const formSettingsEl = document.getElementById("form-settings");
+const btnCancelSettionsEL = document.getElementById("btn-settings");
+
+btnCancelSettionsEL.addEventListener("click", (e) => {
+  formSettingsEl.classList.remove("was-validated");
+  new bootstrap.Tab(homeTabEl).show();
+});
+
+settingsTabEl.addEventListener("shown.bs.tab", async () => {
+  const obj = await window.ctx.loggedUser();
+  const { username, password, email } = obj.dataValues;
+  formSettingsEl.elements["username"].value = username;
+  formSettingsEl.elements["password"].value = password;
+  formSettingsEl.elements["email"].value = email;
+});
+
+formSettingsEl.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(formSettingsEl);
+
+  if (!formSettingsEl.checkValidity()) {
+    e.preventDefault();
+    formSettingsEl.classList.add("was-validated");
+  } else {
+    const usernameValue = formData.get("username");
+    const passwordValue = formData.get("password");
+    const emailValue = formData.get("email");
+    const imageValue = formData.get("image");
+
+    const obj = {
+      username: usernameValue,
+      password: passwordValue,
+      email: emailValue,
+      path: imageValue.path,
+    };
+
+    const person = await window.ctx.updatePerson(
+      obj,
+      (success) => {
+        formSettingsEl.reset();
+        formSettingsEl.classList.remove("was-validated");
+        showToast("text-bg-success", success);
+      },
+      (error) => {
+        showToast("text-bg-danger", error);
+      }
+    );
+    updatePersonDetails(person);
+  }
+});
+
+function updatePersonDetails(person) {
+  if (person !== null) {
+    const imgUserEl = document.getElementById("img-user");
+    const userLoggedEl = document.getElementById("user-logged");
+    userLoggedEl.textContent = `Logged user ${person.username}`;
+    imgUserEl.src = `data:image/png;base64,${person.img64}`;
+    imgUserEl.classList.remove("visually-hidden");
+  }
+}
+
+let visibleSettings = false;
+const inputGroup = document.querySelector(".input-group.settings");
+
+const btnSettings = inputGroup.querySelector(".btn");
+const pwdSettings = inputGroup.querySelector('[type="password"]');
+const iconSettings = btnSettings.querySelector(".bi");
+btnSettings.addEventListener("click", (e) => {
+  e.preventDefault();
+  const hasDisplayed = inputGroup.getAttribute("displayed");
+
+  if (hasDisplayed === null && hasDisplayed !== true) {
+    displayModal(async (value) => {
+      const isPasswordValid = await window.ctx.confirmPassword(value);
+      if (isPasswordValid) {
+        togglePassowrdMaskSettings(e, pwdSettings, iconSettings);
+        inputGroup.setAttribute("displayed", true);
+        bsModal.hide();
+      } else {
+        showToast("text-bg-warning", `password was invalid ${value}`);
+      }
+    });
+  } else {
+    togglePassowrdMaskSettings(e, pwdSettings, iconSettings);
+    inputGroup.removeAttribute("displayed");
+  }
+});
+
+function togglePassowrdMaskSettings(e, pwd, icon) {
+  e.preventDefault();
+  visibleSettings = !visibleSettings;
+  pwd.type = visibleSettings ? "text" : "password";
+  if (visibleSettings) {
+    icon.classList.add("bi-eye");
+    icon.classList.remove("bi-eye-slash");
+  } else {
+    icon.classList.add("bi-eye-slash");
+    icon.classList.remove("bi-eye");
+  }
+}
 
 const endline = "";
 /**

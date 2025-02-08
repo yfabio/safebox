@@ -38,9 +38,9 @@ const onUpdateKey = async (key, success, error) => {
 };
 
 const onGetAllKeys = async (page, filter, error) => {
-  const ITEMS_PER_PAGE = 6;
-
   try {
+    const ITEMS_PER_PAGE = 6;
+
     const total = await Key.count();
 
     const numPages = Math.ceil(total / ITEMS_PER_PAGE);
@@ -161,6 +161,50 @@ const onLoadImage = (setImage) => {
   });
 };
 
+const onLoggedUser = async () => {
+  const session = await Session.findOne({ where: { isActive: true } });
+  return await Person.findByPk(session.dataValues.userId);
+};
+
+const onUpdatePerson = async (obj, success, error) => {
+  let result = null;
+
+  try {
+    const session = await Session.findOne({ where: { isActive: true } });
+    const person = await Person.findByPk(session.dataValues.userId);
+
+    let imageBuffer;
+
+    if (obj.path !== null && obj.path.length > 0) {
+      imageBuffer = fs.readFileSync(obj.path);
+    } else {
+      imageBuffer = person.picture;
+    }
+
+    person.username = obj.username;
+    person.password = obj.password;
+    person.email = obj.email;
+    person.picture = imageBuffer;
+    person.save();
+    success("person was updated!");
+    result = {
+      username: person.username,
+      img64: person.picture.toString("base64"),
+    };
+  } catch (error) {
+    error("Error while updating person");
+  }
+
+  return result;
+};
+
+const onConfirmPassword = async (pwd) => {
+  const session = await Session.findOne({ where: { isActive: true } });
+  const person = await Person.findByPk(session.dataValues.userId);
+  const { password } = person.dataValues;
+  return password === pwd ? true : false;
+};
+
 contextBridge.exposeInMainWorld("ctx", {
   createKey: onCreateKey,
   getAllKeys: onGetAllKeys,
@@ -171,4 +215,7 @@ contextBridge.exposeInMainWorld("ctx", {
   login: onLogin,
   logout: onLogout,
   loadImage: onLoadImage,
+  loggedUser: onLoggedUser,
+  updatePerson: onUpdatePerson,
+  confirmPassword: onConfirmPassword,
 });

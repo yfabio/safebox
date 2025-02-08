@@ -9,6 +9,7 @@ const sequelize = new Sequelize({
   database: "safebox",
   storage: dbFile,
   dialect: "sqlite",
+  logging: false,
 });
 
 module.exports = sequelize;

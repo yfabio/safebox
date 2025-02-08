@@ -3,19 +3,22 @@ const alreadyHaveLink = document.getElementById("already-have");
 
 const contents = document.querySelectorAll(".content");
 
+const registerForm = document.querySelector(".register #form-register");
+const loginForm = document.querySelector(".login #form-login");
+
 doNotLink.addEventListener("click", (e) => {
   e.preventDefault();
   contents.forEach((content) => content.classList.remove("visually-hidden"));
   document.querySelector(".login").classList.add("visually-hidden");
+  loginForm.classList.remove("was-validated");
 });
 
 alreadyHaveLink.addEventListener("click", (e) => {
   e.preventDefault();
   contents.forEach((content) => content.classList.remove("visually-hidden"));
   document.querySelector(".register").classList.add("visually-hidden");
+  registerForm.classList.remove("was-validated");
 });
-
-const registerForm = document.querySelector(".register #form-register");
 
 registerForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -36,25 +39,21 @@ registerForm.addEventListener("submit", (e) => {
 
   if (!registerForm.checkValidity()) {
     e.preventDefault();
+    registerForm.classList.add("was-validated");
   } else {
     window.ctx.savePerson(
       obj,
       (message) => {
-        registerForm.reset();
-        showToast("text-bg-success", message);
-        alreadyHaveLink.click();
         registerForm.classList.remove("was-validated");
+        showToast("text-bg-success", message);
+        registerForm.reset();
       },
       (error) => {
         showToast("text-bg-danger", error);
       }
     );
   }
-
-  registerForm.classList.add("was-validated");
 });
-
-const loginForm = document.querySelector(".login #form-login");
 
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -71,15 +70,17 @@ loginForm.addEventListener("submit", (e) => {
 
   if (!loginForm.checkValidity()) {
     e.preventDefault();
+    loginForm.classList.add("was-validated");
   } else {
     window.ctx.login(
       credential,
       (result) => {
         if (!result.success) {
           showToast("text-bg-warning", result.message);
+        } else {
+          loginForm.classList.remove("was-validated");
+          loginForm.reset();
         }
-        loginForm.reset();
-        loginForm.classList.remove("was-validated");
       },
       (error) => {
         showToast("text-bg-danger", error);
@@ -87,7 +88,6 @@ loginForm.addEventListener("submit", (e) => {
       }
     );
   }
-  loginForm.classList.add("was-validated");
 });
 
 const toast = document.getElementById("toast");
