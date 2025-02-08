@@ -34,17 +34,24 @@ registerForm.addEventListener("submit", (e) => {
     path: imageValue.path,
   };
 
-  window.ctx.savePerson(
-    obj,
-    (message) => {
-      registerForm.reset();
-      showToast("text-bg-success", message);
-      alreadyHaveLink.click();
-    },
-    (error) => {
-      showToast("text-bg-danger", error);
-    }
-  );
+  if (!registerForm.checkValidity()) {
+    e.preventDefault();
+  } else {
+    window.ctx.savePerson(
+      obj,
+      (message) => {
+        registerForm.reset();
+        showToast("text-bg-success", message);
+        alreadyHaveLink.click();
+        registerForm.classList.remove("was-validated");
+      },
+      (error) => {
+        showToast("text-bg-danger", error);
+      }
+    );
+  }
+
+  registerForm.classList.add("was-validated");
 });
 
 const loginForm = document.querySelector(".login #form-login");
@@ -62,18 +69,25 @@ loginForm.addEventListener("submit", (e) => {
     password: passwordValue,
   };
 
-  window.ctx.login(
-    credential,
-    (result) => {
-      if (!result.success) {
-        showToast("text-bg-warning", result.message);
+  if (!loginForm.checkValidity()) {
+    e.preventDefault();
+  } else {
+    window.ctx.login(
+      credential,
+      (result) => {
+        if (!result.success) {
+          showToast("text-bg-warning", result.message);
+        }
+        loginForm.reset();
+        loginForm.classList.remove("was-validated");
+      },
+      (error) => {
+        showToast("text-bg-danger", error);
+        loginForm.reset();
       }
-      loginForm.reset();
-    },
-    (error) => {
-      showToast("text-bg-danger", error);
-    }
-  );
+    );
+  }
+  loginForm.classList.add("was-validated");
 });
 
 const toast = document.getElementById("toast");

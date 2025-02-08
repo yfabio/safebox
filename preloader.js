@@ -5,10 +5,21 @@ const fs = require("fs");
 
 const Key = require("./model/Key");
 const Person = require("./model/Person");
+const Session = require("./model/Session");
+
+Person.hasMany(Key, { onDelete: "CASCADE" });
+Key.belongsTo(Person);
 
 const onCreateKey = async (key, success, error) => {
   try {
+    const session = await Session.findOne({ where: { isActive: true } });
+
+    const personDb = await Person.findByPk(session.dataValues.userId);
+
     const newKey = await Key.create({ ...key });
+
+    await personDb.addKey(newKey);
+
     success(`new key created! #id ${newKey.id}`);
   } catch (err) {
     error("error while creating new key");
@@ -34,12 +45,18 @@ const onGetAllKeys = async (page, filter, error) => {
 
     const numPages = Math.ceil(total / ITEMS_PER_PAGE);
 
+    const session = await Session.findOne({ where: { isActive: true } });
+
     const keys = await Key.findAll({
       where: {
         title: {
           [Op.substring]: filter,
         },
+        personId: {
+          [Op.eq]: session.dataValues.userId,
+        },
       },
+      // include: "person", includes person if at leas one person exist
       offset: (page - 1) * ITEMS_PER_PAGE,
       limit: ITEMS_PER_PAGE,
     });
@@ -115,7 +132,7 @@ const onLogin = async (obj, success, error) => {
       },
     });
     if (personDb) {
-      localStorage.setItem("user", personDb.id);
+      await Session.create({ userId: personDb.dataValues.id });
       ipcRenderer.send("success:login", personDb.dataValues);
       success({ success: true });
     } else {
@@ -129,7 +146,12 @@ const onLogin = async (obj, success, error) => {
   }
 };
 
-const onLogout = () => {
+const onLogout = async () => {
+  await Session.destroy({
+    where: {
+      isActive: true,
+    },
+  });
   ipcRenderer.send("user:logout");
 };
 

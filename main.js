@@ -6,8 +6,9 @@ const path = require("path");
 const sequelize = require("./sqlite/db");
 const Key = require("./model/Key");
 const Person = require("./model/Person");
+const Session = require("./model/Session");
 
-Person.hasMany(Key);
+Person.hasMany(Key, { onDelete: "CASCADE" });
 Key.belongsTo(Person);
 
 // Set env
@@ -46,6 +47,7 @@ function createMainWindow() {
   mainWindow.on("close", () => {
     if (mainWindow) {
       mainWindow = null;
+      console.log("main windows was closed");
     }
   });
 }
@@ -106,9 +108,18 @@ ipcMain.on("success:login", async (e, person) => {
 
     const personDb = await Person.findByPk(person.id);
 
-    const img64 = personDb.picture.toString("base64");
+    let img64;
 
-    mainWindow.webContents.send("user:image", img64);
+    if (personDb.picture !== null) {
+      img64 = personDb.picture.toString("base64");
+    } else {
+      img64 = null;
+    }
+
+    mainWindow.webContents.send("user:image", {
+      username: personDb.username,
+      img64,
+    });
   }
 });
 
@@ -154,7 +165,11 @@ app.on("window-all-closed", () => {
 
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createMainWindow();
+    if (mainWindow) {
+      createMainWindow();
+    } else {
+      createLoginWindow();
+    }
   }
 });
 

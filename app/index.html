@@ -70,13 +70,8 @@
           </li>
         </ul>
         <div class="d-flex align-items-center justify-content-end my-2">
-          <span class="lead">Logged user yfabio</span>
-          <img
-            id="img-user"
-            src="./img/tcs photo-3.png"
-            alt="picture"
-            class="img-thumbnail img-sm mx-2"
-          />
+          <span id="user-logged" class="lead me-2"></span>
+          <img id="img-user" alt="picture" class="img-thumbnail me-2 img-sm" />
           <button
             id="btn-logout"
             class="btn btn-success btn-sm"
@@ -157,6 +152,7 @@
             <div class="col-md-6 offset-md-3">
               <form id="form-new-key" novalidate>
                 <input type="text" name="id" hidden />
+                <input type="text" name="personId" hidden />
                 <div class="mb-2">
                   <label for="Date" class="form-label">Date</label>
                   <input
@@ -207,7 +203,7 @@
                 <div class="mb-2">
                   <label for="password" class="from-label mb-2">Password</label>
                   <div class="input-group">
-                    <button class="btn btn-dark">
+                    <button id="btn-mask-new-key" class="btn btn-dark">
                       <i class="bi bi-eye-slash"></i>
                     </button>
                     <input

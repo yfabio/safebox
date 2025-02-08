@@ -180,9 +180,11 @@ const formNewKey = document.getElementById("form-new-key");
 const btnSaveNewKey = document.getElementById("btn-save-new-key");
 
 const btnCancelNewKey = document.getElementById("btn-cancel-new-key");
+
 btnCancelNewKey.addEventListener("click", () => {
   formNewKey.reset();
   btnSaveNewKey.textContent = "Save";
+  formNewKey.classList.remove("was-validated");
   new bootstrap.Tab(homeTabEl).show();
 });
 
@@ -220,6 +222,7 @@ formNewKey.addEventListener("submit", (e) => {
         (message) => {
           formNewKey.reset();
           showToast("text-bg-success", message);
+          formNewKey.classList.remove("was-validated");
           new bootstrap.Tab(homeTabEl).show();
         },
         (error) => {
@@ -233,6 +236,7 @@ formNewKey.addEventListener("submit", (e) => {
         (message) => {
           formNewKey.reset();
           showToast("text-bg-success", message);
+          formNewKey.classList.remove("was-validated");
           new bootstrap.Tab(homeTabEl).show();
         },
         (error) => {
@@ -256,7 +260,9 @@ const pagination = document.getElementById("pagination");
 const alertKeysEl = document.getElementById("content-keys-alert");
 const contentKeysEl = document.getElementById("content-keys");
 
-homeTabEl.addEventListener("shown.bs.tab", () => loadKeys());
+homeTabEl.addEventListener("shown.bs.tab", () => {
+  loadKeys();
+});
 
 async function loadKeys(page = 1, filter = "") {
   const result = await window.ctx.getAllKeys(page, filter, (error) => {
@@ -272,7 +278,11 @@ async function loadKeys(page = 1, filter = "") {
     contentKeysEl.classList.remove("visually-hidden");
   }
 
-  const keys = result.keys;
+  let keys = [];
+
+  if (result?.keys) {
+    keys = result.keys;
+  }
 
   let content;
   tableBody.innerHTML = "";
@@ -307,7 +317,7 @@ async function loadKeys(page = 1, filter = "") {
 
   let listPages = "";
 
-  for (let i = 1; i <= result.numPages; i++) {
+  for (let i = 1; i <= result?.numPages; i++) {
     listPages += `<li class="page-item"><button onclick="nextPage(${i})" class="page-link ${
       i === result.currentPage ? "active" : ""
     }">${i}</button></li>`;
@@ -378,6 +388,8 @@ function confirmToClipBoard(id) {
  * @param {int} id
  */
 async function editKey(id) {
+  console.log(id);
+
   const dbKey = await window.ctx.getKeyById(id, (error) => {
     showToast("text-bg-danger", error);
   });
@@ -458,9 +470,17 @@ btnLogoutEl.addEventListener("click", (e) => {
   window.ctx.logout();
 });
 
-window.ctx.loadImage((img) => {
+window.ctx.loadImage((obj) => {
   const imgUserEl = document.getElementById("img-user");
-  imgUserEl.src = `data:image/png;base64,${img}`;
+  const userLoggedEl = document.getElementById("user-logged");
+  userLoggedEl.textContent = `Logged user ${obj.username}`;
+  if (obj.img64) {
+    imgUserEl.classList.remove("visually-hidden");
+    imgUserEl.src = `data:image/png;base64,${obj.img64}`;
+  } else {
+    imgUserEl.classList.add("visually-hidden");
+  }
+  loadKeys();
 });
 
 const endline = "";
