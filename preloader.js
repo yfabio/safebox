@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, clipboard } = require("electron");
 const { Op } = require("sequelize");
 
 const fs = require("fs");
@@ -205,6 +205,17 @@ const onConfirmPassword = async (pwd) => {
   return password === pwd ? true : false;
 };
 
+const onCopyToClipboard = async (id, success, error) => {
+  try {
+    const obj = await Key.findByPk(id);
+    const key = obj.dataValues;
+    clipboard.writeText(key.password);
+    success("Key copied!");
+  } catch (err) {
+    error("Could not copy to clipboard");
+  }
+};
+
 contextBridge.exposeInMainWorld("ctx", {
   createKey: onCreateKey,
   getAllKeys: onGetAllKeys,
@@ -218,4 +229,5 @@ contextBridge.exposeInMainWorld("ctx", {
   loggedUser: onLoggedUser,
   updatePerson: onUpdatePerson,
   confirmPassword: onConfirmPassword,
+  copyToClipboard: onCopyToClipboard,
 });

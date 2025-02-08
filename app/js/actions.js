@@ -307,7 +307,7 @@ async function loadKeys(page = 1, filter = "") {
     contentKeysEl.classList.remove("visually-hidden");
   }
 
-  if (result !== null && result.keys !== null && result.keys !== undefined) {
+  if (result !== null && result?.keys) {
     let content;
     tableBody.innerHTML = "";
 
@@ -318,7 +318,7 @@ async function loadKeys(page = 1, filter = "") {
       <td>${key.username}</td>
       <td class="text-truncate">${key.password}</td>
       <td>
-        <button onclick="clipBoardKey(${key.id})" class="btn btn-sm btn-outline-dark"       
+        <button onclick="copyToclipboard(${key.id})" class="btn btn-sm btn-outline-dark"       
         data-bs-toggle="tooltip" 
         data-bs-title="copy to clipboard">
           <i class="bi bi-clipboard"></i>
@@ -384,28 +384,25 @@ function nextPage(index) {
   loadKeys(index);
 }
 
-function clipBoardKey(id) {
-  const title = "Type your password to allow this";
-
-  const body = `
-                <div class="input-group">
-                  <input type="password" name="pwd" id="pwd" class="form-control">
-                  <button onclick="confirmToClipBoard(${id})" id="pwd" class="btn btn-outline-dark">confirm</button>
-                </div>
-            `;
-
-  showModal(title, body);
-}
-
-/**
- * Copying to clipboard once users type their password.
- * @param {int} id
- */
-function confirmToClipBoard(id) {
-  console.log("confirm to clipboard ", id);
-  if (bsModal) {
-    bsModal.hide();
-  }
+function copyToclipboard(id) {
+  displayModal(async (value) => {
+    const isPasswordValid = await window.ctx.confirmPassword(value);
+    if (isPasswordValid) {
+      window.ctx.copyToClipboard(
+        id,
+        (success) => {
+          showToast("text-bg-success", success);
+        },
+        (error) => {
+          showToast("text-bg-danger", error);
+        }
+      );
+      bsModal.hide();
+    } else {
+      showToast("text-bg-warning", "password was invalid");
+      bsModal.hide();
+    }
+  });
 }
 
 /**
