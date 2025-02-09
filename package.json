@@ -1,5 +1,5 @@
 {
-  "name": "electron-starter",
+  "name": "safebox",
   "productName": "Safebox",
   "version": "1.0.0",
   "description": "Simple starter package for Electron apps",
