@@ -260,6 +260,14 @@ const onDoDecrypt = (text, pwd) => {
   return plaintext;
 };
 
+ipcRenderer.on("clear:session", async () => {
+  try {
+    await Session.destroy({ where: { isActive: true } });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 contextBridge.exposeInMainWorld("ctx", {
   createKey: onCreateKey,
   getAllKeys: onGetAllKeys,

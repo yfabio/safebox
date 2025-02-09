@@ -45,6 +45,7 @@ function createMainWindow() {
 
   mainWindow.on("close", () => {
     if (mainWindow) {
+      mainWindow.webContents.send("clear:session");
       mainWindow = null;
       app.quit();
     }
@@ -77,6 +78,7 @@ function createLoginWindow() {
 
   loginWindow.on("close", () => {
     if (loginWindow) {
+      loginWindow.webContents.send("clear:session");
       loginWindow = null;
       app.quit();
     }
