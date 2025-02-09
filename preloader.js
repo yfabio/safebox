@@ -3,6 +3,10 @@ const { Op } = require("sequelize");
 
 const fs = require("fs");
 
+const { encrypt, decrypt } = require("./crypto/Crypto");
+
+const bcrypt = require("bcrypt");
+
 const Key = require("./model/Key");
 const Person = require("./model/Person");
 const Session = require("./model/Session");
@@ -15,6 +19,10 @@ const onCreateKey = async (key, success, error) => {
     const session = await Session.findOne({ where: { isActive: true } });
 
     const personDb = await Person.findByPk(session.dataValues.userId);
+
+    const pwdEncrypted = encrypt(key.password, personDb.password);
+
+    key.password = pwdEncrypted;
 
     const newKey = await Key.create({ ...key });
 
@@ -29,6 +37,14 @@ const onCreateKey = async (key, success, error) => {
 
 const onUpdateKey = async (key, success, error) => {
   try {
+    const session = await Session.findOne({ where: { isActive: true } });
+
+    const personDb = await Person.findByPk(session.dataValues.userId);
+
+    const pwdEncrypted = encrypt(key.password, personDb.password);
+
+    key.password = pwdEncrypted;
+
     await Key.update({ ...key }, { where: { id: key.id } });
     success(`key was updated! #id ${key.id}`);
   } catch (err) {
@@ -94,9 +110,19 @@ const onDeleteKey = async (id, success, error) => {
 
 const onGetKeyById = async (id, error) => {
   try {
+    const session = await Session.findOne({ where: { isActive: true } });
+    const person = await Person.findByPk(session.dataValues.userId);
+
     const dbKey = await Key.findByPk(id);
-    return dbKey.dataValues;
-  } catch (error) {
+
+    const key = dbKey.dataValues;
+
+    const pwdDecrypted = decrypt(key.password, person.password);
+
+    key.password = pwdDecrypted;
+
+    return key;
+  } catch (err) {
     error("error while retrieving key");
   }
 };
@@ -109,14 +135,16 @@ const onSavePerson = async (obj, success, error) => {
       imageBuffer = fs.readFileSync(obj.path);
     }
 
+    const hashedPwd = bcrypt.hashSync(obj.password, 12);
+
     const person = {
       username: obj.username,
-      password: obj.password,
+      password: hashedPwd,
       email: obj.email,
       picture: imageBuffer,
     };
 
-    const personSaved = await Person.create({ ...person });
+    await Person.create({ ...person });
     success("person was saved successfully!");
   } catch (error) {
     console.log(error);
@@ -128,10 +156,13 @@ const onLogin = async (obj, success, error) => {
   try {
     const personDb = await Person.findOne({
       where: {
-        [Op.and]: [{ username: obj.username }, { password: obj.password }],
+        [Op.and]: [{ username: obj.username }],
       },
     });
-    if (personDb) {
+
+    const match = await bcrypt.compare(obj.password, personDb.password);
+
+    if (personDb.dataValues != null && match) {
       await Session.create({ userId: personDb.dataValues.id });
       ipcRenderer.send("success:login", personDb.dataValues);
       success({ success: true });
@@ -182,7 +213,6 @@ const onUpdatePerson = async (obj, success, error) => {
     }
 
     person.username = obj.username;
-    person.password = obj.password;
     person.email = obj.email;
     person.picture = imageBuffer;
     person.save();
@@ -191,7 +221,7 @@ const onUpdatePerson = async (obj, success, error) => {
       username: person.username,
       img64: person.picture.toString("base64"),
     };
-  } catch (error) {
+  } catch (err) {
     error("Error while updating person");
   }
 
@@ -202,18 +232,32 @@ const onConfirmPassword = async (pwd) => {
   const session = await Session.findOne({ where: { isActive: true } });
   const person = await Person.findByPk(session.dataValues.userId);
   const { password } = person.dataValues;
-  return password === pwd ? true : false;
+  const match = await bcrypt.compare(pwd, password);
+  return match;
 };
 
 const onCopyToClipboard = async (id, success, error) => {
   try {
+    const session = await Session.findOne({ where: { isActive: true } });
+    const person = await Person.findByPk(session.dataValues.userId);
     const obj = await Key.findByPk(id);
     const key = obj.dataValues;
-    clipboard.writeText(key.password);
+    const pwdDecrypted = decrypt(key.password, person.password);
+    clipboard.writeText(pwdDecrypted);
     success("Key copied!");
   } catch (err) {
     error("Could not copy to clipboard");
   }
+};
+
+const onDoEncrypt = (text, pwd) => {
+  const encrypted = encrypt(text, pwd);
+  return encrypted;
+};
+
+const onDoDecrypt = (text, pwd) => {
+  const plaintext = decrypt(text, pwd);
+  return plaintext;
 };
 
 contextBridge.exposeInMainWorld("ctx", {
@@ -230,4 +274,6 @@ contextBridge.exposeInMainWorld("ctx", {
   updatePerson: onUpdatePerson,
   confirmPassword: onConfirmPassword,
   copyToClipboard: onCopyToClipboard,
+  doEncrypt: onDoEncrypt,
+  doDecrypt: onDoDecrypt,
 });

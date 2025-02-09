@@ -316,9 +316,11 @@ async function loadKeys(page = 1, filter = "") {
       <td>${key.date}</td>
       <td>${key.title}</td>
       <td>${key.username}</td>
-      <td class="text-truncate">${key.password}</td>
+      <td>${key.password.substring(0, 20)}</td>
       <td>
-        <button onclick="copyToclipboard(${key.id})" class="btn btn-sm btn-outline-dark"       
+        <button onclick="copyToclipboard(${
+          key.id
+        })" class="btn btn-sm btn-outline-dark"       
         data-bs-toggle="tooltip" 
         data-bs-title="copy to clipboard">
           <i class="bi bi-clipboard"></i>
@@ -523,9 +525,8 @@ btnCancelSettionsEL.addEventListener("click", (e) => {
 
 settingsTabEl.addEventListener("shown.bs.tab", async () => {
   const obj = await window.ctx.loggedUser();
-  const { username, password, email } = obj.dataValues;
+  const { username, email } = obj.dataValues;
   formSettingsEl.elements["username"].value = username;
-  formSettingsEl.elements["password"].value = password;
   formSettingsEl.elements["email"].value = email;
 });
 
@@ -538,13 +539,11 @@ formSettingsEl.addEventListener("submit", async (e) => {
     formSettingsEl.classList.add("was-validated");
   } else {
     const usernameValue = formData.get("username");
-    const passwordValue = formData.get("password");
     const emailValue = formData.get("email");
     const imageValue = formData.get("image");
 
     const obj = {
       username: usernameValue,
-      password: passwordValue,
       email: emailValue,
       path: imageValue.path,
     };
@@ -580,45 +579,45 @@ function updatePersonDetails(person) {
   }
 }
 
-let visibleSettings = false;
-const inputGroup = document.querySelector(".input-group.settings");
+// let visibleSettings = false;
+// const inputGroup = document.querySelector(".input-group.settings");
 
-const btnSettings = inputGroup.querySelector(".btn");
-const pwdSettings = inputGroup.querySelector('[type="password"]');
-const iconSettings = btnSettings.querySelector(".bi");
-btnSettings.addEventListener("click", (e) => {
-  e.preventDefault();
-  const hasDisplayed = inputGroup.getAttribute("displayed");
+// const btnSettings = inputGroup.querySelector(".btn");
+// const pwdSettings = inputGroup.querySelector('[type="password"]');
+// const iconSettings = btnSettings.querySelector(".bi");
+// btnSettings.addEventListener("click", (e) => {
+//   e.preventDefault();
+//   const hasDisplayed = inputGroup.getAttribute("displayed");
 
-  if (hasDisplayed === null && hasDisplayed !== true) {
-    displayModal(async (value) => {
-      const isPasswordValid = await window.ctx.confirmPassword(value);
-      if (isPasswordValid) {
-        togglePassowrdMaskSettings(e, pwdSettings, iconSettings);
-        inputGroup.setAttribute("displayed", true);
-        bsModal.hide();
-      } else {
-        showToast("text-bg-warning", `password was invalid ${value}`);
-      }
-    });
-  } else {
-    togglePassowrdMaskSettings(e, pwdSettings, iconSettings);
-    inputGroup.removeAttribute("displayed");
-  }
-});
+//   if (hasDisplayed === null && hasDisplayed !== true) {
+//     displayModal(async (value) => {
+//       const isPasswordValid = await window.ctx.confirmPassword(value);
+//       if (isPasswordValid) {
+//         togglePassowrdMaskSettings(e, pwdSettings, iconSettings);
+//         inputGroup.setAttribute("displayed", true);
+//         bsModal.hide();
+//       } else {
+//         showToast("text-bg-warning", `password was invalid ${value}`);
+//       }
+//     });
+//   } else {
+//     togglePassowrdMaskSettings(e, pwdSettings, iconSettings);
+//     inputGroup.removeAttribute("displayed");
+//   }
+// });
 
-function togglePassowrdMaskSettings(e, pwd, icon) {
-  e.preventDefault();
-  visibleSettings = !visibleSettings;
-  pwd.type = visibleSettings ? "text" : "password";
-  if (visibleSettings) {
-    icon.classList.add("bi-eye");
-    icon.classList.remove("bi-eye-slash");
-  } else {
-    icon.classList.add("bi-eye-slash");
-    icon.classList.remove("bi-eye");
-  }
-}
+// function togglePassowrdMaskSettings(e, pwd, icon) {
+//   e.preventDefault();
+//   visibleSettings = !visibleSettings;
+//   pwd.type = visibleSettings ? "text" : "password";
+//   if (visibleSettings) {
+//     icon.classList.add("bi-eye");
+//     icon.classList.remove("bi-eye-slash");
+//   } else {
+//     icon.classList.add("bi-eye-slash");
+//     icon.classList.remove("bi-eye");
+//   }
+// }
 
 /**
  * Loading all key when window was ready
