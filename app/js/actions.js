@@ -318,11 +318,11 @@ async function loadKeys(page = 1, filter = "") {
       <td>${key.username}</td>
       <td>${key.password.substring(0, 20)}</td>
       <td>
-        <button onclick="copyToclipboard(${
-          key.id
-        })" class="btn btn-sm btn-outline-dark"       
-        data-bs-toggle="tooltip" 
-        data-bs-title="copy to clipboard">
+        <button 
+                class="btn btn-sm btn-outline-dark" 
+                data-bs-toggle="tooltip"
+                data-bs-title="copy to clipboard"
+                onclick="copyToclipboard(${key.id})">
           <i class="bi bi-clipboard"></i>
         </button>
       </td>
@@ -375,6 +375,8 @@ async function loadKeys(page = 1, filter = "") {
                        `;
 
     pagination.innerHTML = paginationContent;
+    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach((tooltip) => new bootstrap.Tooltip(tooltip));
   }
 }
 
