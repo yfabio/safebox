@@ -146,7 +146,7 @@ const onSavePerson = async (obj, success, error) => {
 
     await Person.create({ ...person });
     success("person was saved successfully!");
-  } catch (error) {
+  } catch (err) {
     console.log(error);
     error("Error while saving the person");
   }
@@ -172,7 +172,7 @@ const onLogin = async (obj, success, error) => {
         message: `Could not find user ${obj.username}`,
       });
     }
-  } catch (error) {
+  } catch (err) {
     error("Error while trying to login");
   }
 };

@@ -11,7 +11,7 @@ const Session = require("./model/Session");
 Person.hasMany(Key, { onDelete: "CASCADE" });
 Key.belongsTo(Person);
 
-process.env.NODE_ENV = "development";
+process.env.NODE_ENV = "production";
 
 const isDev = process.env.NODE_ENV !== "production" ? true : false;
 const isMac = process.platform === "darwin" ? true : false;
@@ -46,7 +46,7 @@ function createMainWindow() {
   mainWindow.on("close", () => {
     if (mainWindow) {
       mainWindow = null;
-      console.log("main windows was closed");
+      app.quit();
     }
   });
 }
@@ -78,6 +78,7 @@ function createLoginWindow() {
   loginWindow.on("close", () => {
     if (loginWindow) {
       loginWindow = null;
+      app.quit();
     }
   });
 }
@@ -87,11 +88,14 @@ app.on("ready", async () => {
   createLoginWindow();
 
   if (mainWindow) {
+    const mainMenu = Menu.buildFromTemplate(menu);
+    mainWindow.setMenu(mainMenu);
     mainWindow.hide();
   }
 
-  const mainMenu = Menu.buildFromTemplate(menu);
-  Menu.setApplicationMenu(mainMenu);
+  if (loginWindow) {
+    loginWindow.setMenu(null);
+  }
 
   try {
     await sequelize.sync();
@@ -152,7 +156,6 @@ const menu = [
 app.on("quit", async () => {
   if (sequelize) {
     await sequelize.close();
-    console.log("database was closed successfult");
   }
 });
 
@@ -164,7 +167,7 @@ app.on("window-all-closed", () => {
 
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    if (mainWindow) {
+    if (mainWindow !== null) {
       createMainWindow();
     } else {
       createLoginWindow();
