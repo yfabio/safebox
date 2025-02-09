@@ -1,6 +1,6 @@
 {
   "name": "safebox",
-  "productName": "Safebox",
+  "productName": "safebox",
   "version": "1.0.0",
   "description": "Simple starter package for Electron apps",
   "main": "main.js",
