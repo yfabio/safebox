@@ -1,3 +1,4 @@
 /node_modules
 .DS_Store
 /release-builds
+/safebox-win32-x64

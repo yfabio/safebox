@@ -11,7 +11,7 @@ const Session = require("./model/Session");
 Person.hasMany(Key, { onDelete: "CASCADE" });
 Key.belongsTo(Person);
 
-process.env.NODE_ENV = "production";
+process.env.NODE_ENV = "development";
 
 const isDev = process.env.NODE_ENV !== "production" ? true : false;
 const isMac = process.platform === "darwin" ? true : false;
@@ -100,7 +100,7 @@ app.on("ready", async () => {
   }
 
   try {
-    await sequelize.sync();
+    await sequelize.sync({ force: true });
   } catch (error) {
     console.log("error while synchronizing database", error);
   }

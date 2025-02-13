@@ -156,7 +156,7 @@ const onLogin = async (obj, success, error) => {
   try {
     const personDb = await Person.findOne({
       where: {
-        [Op.and]: [{ username: obj.username }],
+        username: obj.username,
       },
     });
 
