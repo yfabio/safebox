@@ -11,7 +11,7 @@ const Session = require("./model/Session");
 Person.hasMany(Key, { onDelete: "CASCADE" });
 Key.belongsTo(Person);
 
-process.env.NODE_ENV = "development";
+process.env.NODE_ENV = "production";
 
 const isDev = process.env.NODE_ENV !== "production" ? true : false;
 const isMac = process.platform === "darwin" ? true : false;
@@ -26,7 +26,7 @@ function createMainWindow() {
     height: 600,
     minWidth: 600,
     icon: `${__dirname}/assets/icons/icon.png`,
-    resizable: isDev ? true : false,
+    resizable: true,
     backgroundColor: "white",
     webPreferences: {
       sandbox: false,
