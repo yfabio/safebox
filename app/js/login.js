@@ -26,12 +26,22 @@ alreadyHaveLink.addEventListener("click", (e) => {
 registerForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
+  const extensions = ["image/jpeg", "image/png"];
+
   const formData = new FormData(registerForm);
 
   const usernameValue = formData.get("username");
   const passwordValue = formData.get("password");
   const emailValue = formData.get("email");
   const imageValue = formData.get("image");
+
+  if (imageValue.path !== "" && !extensions.includes(imageValue.type)) {
+    showToast(
+      "text-bg-danger",
+      `The File ${imageValue.name} is not supported only images`
+    );
+    return;
+  }
 
   const obj = {
     username: usernameValue,
