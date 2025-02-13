@@ -100,7 +100,7 @@ app.on("ready", async () => {
   }
 
   try {
-    await sequelize.sync({ force: true });
+    await sequelize.sync();
   } catch (error) {
     console.log("error while synchronizing database", error);
   }
