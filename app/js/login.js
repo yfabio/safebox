@@ -58,8 +58,9 @@ registerForm.addEventListener("submit", (e) => {
       obj,
       (message) => {
         registerForm.classList.remove("was-validated");
-        showToast("text-bg-success", message);
         registerForm.reset();
+        alreadyHaveLink.click();
+        showToast("text-bg-success", message);
       },
       (error) => {
         showToast("text-bg-danger", error);
